@@ -6,6 +6,9 @@ SELECT
 	, ROUND(MAX(maximum_distance::numeric), 2) AS maximum_distance
 	, ROUND(SUM(total_distance)::numeric / SUM(day_total)::numeric, 2) AS average_distance
 	, ROUND(MIN(minimum_distance)::numeric, 2) AS minimum_distance
+		-- When taking the distance into account, we can find quite some unsuccesful rides. 
+		-- There are over a 170 rides of distance 0 and over 5% of the the total rides are under the 50 meters
+		-- Putting a threshold at a certain minimum distance might contribute to more accurate minimum and average distances
 FROM b_total_rides_info
 	WHERE minimum_distance IS NOT NULL
 	GROUP BY rider_frequency
@@ -15,4 +18,5 @@ FROM b_total_rides_info
 			WHEN 'Frequent-rider' THEN 2
 			WHEN 'Low-frequent-rider' THEN 3
 		END
-)	
+)
+		

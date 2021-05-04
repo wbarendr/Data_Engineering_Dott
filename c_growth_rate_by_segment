@@ -1,32 +1,36 @@
 CREATE TABLE c_growth_rate_by_segment 
 	AS (
+		-- this table only shows relevant data starting at the 2019-06-15. 
+		--Except for the segment 'New Rider' There the relevant data starts at 2019-06-08 
 SELECT 
 	day
 	, customer_segment
 	, day_total_week_before
 	, day_total
 	, CASE
+		WHEN day_total_week_before IS NULL THEN 'Insufficient Data'
 		WHEN day_total = 0 AND day_total_week_before = 0 THEN '0.00%'
 		WHEN day_total = 0 AND day_total_week_before != 0 THEN '-100.00%'
 		WHEN day_total != 0 AND day_total_week_before = 0 THEN 'Infinity'
 		ELSE 
 			CASE 
 			WHEN ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) > 100
-				THEN CONCAT('+', ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) - 100, '%')
+				THEN CONCAT('+', ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) - 100, '%') 
 			ELSE CONCAT('-', 100 - ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2), '%')
-			END
+		END
 	END as growth_rate
+			-- making data relative and adding char symbols
+			-- looks nice in text, but might actually be inconvenient when using data
 	FROM (
-
 	SELECT 
 		day
 		, customer_segment
 		, day_total
 		, CASE 
 			WHEN customer_segment = LAG(customer_segment, 7) OVER (ORDER BY customer_segment, day)
-			THEN COALESCE(LAG(day_total, 7) OVER (ORDER BY customer_segment, day), 0)
+				THEN COALESCE(LAG(day_total, 7) OVER (ORDER BY customer_segment, day), 0)
 			ELSE 0
-		END AS day_total_week_before
+		END AS day_total_week_before -- looks at the day total of 7 days before if it has same customer segment
 		FROM (
 		SELECT 
 			d.day
@@ -34,19 +38,19 @@ SELECT
 			, COALESCE(c.total_day, 0) as day_total
 			FROM b_dates_customer_segment d
 			LEFT JOIN (
-		SELECT 
-			day
-			, customer_segment
-			, COUNT(*) as total_day
-		FROM b_total_rides_info c
-			GROUP BY 
+			SELECT 
 				day
 				, customer_segment
-		) AS c
+				, COUNT(*) as total_day
+			FROM b_total_rides_info c
+				GROUP BY 
+					day
+					, customer_segment
+			) AS c
 				ON c.day = d.day
 				AND c.customer_segment = d.customer_segment
-	) d
-) w
+		) d
+	) w
 	ORDER BY 
 		CASE customer_segment
 			WHEN 'New Rider' THEN 1

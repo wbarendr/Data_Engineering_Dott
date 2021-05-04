@@ -76,7 +76,9 @@ SELECT
 		WHEN rides_in_t_1 >= 1 AND rides_in_t = 0 THEN 'Retainable'
 		WHEN rides_in_t_1 = 0 AND rides_in_t >= 1 THEN 'Returned'
 		WHEN rides_in_t_1 = 0 AND rides_in_t = 0 THEN 'Inactive'
-		ELSE 'Error'
+		ELSE 'Undefined - No data' 
+		-- Undefined will be set when there is no data available
+		-- this will be for the dates between 2019-06-01 and 2019-06-07 when the user is not a 'New Rider'
 		END AS Customer_Segment
 	, total_distance
 	, minimum_distance
@@ -106,7 +108,7 @@ SELECT
 					THEN LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start) - LAG(cum_day_total, 14) OVER(ORDER BY user_id, day_start)
 					ELSE LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start)
 				END
-			ELSE 0
+			ELSE NULL
 			END AS rides_in_T_1 -- calculates all rides a user had between 8 and 14 days ago (T - 1) 
 			-- This is a large calculation for a value which can be found in the table 7 days prior at rides_in_t 
 			-- only when doing this, nesting select seems necessary and the RUN-time was 1.2 seconds longer
