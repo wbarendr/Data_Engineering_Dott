@@ -1,0 +1,6 @@
+CREATE TABLE a_dates_in_june
+	AS (
+	SELECT 
+		date_trunc('day', dd):: date as day
+	FROM generate_series( '2019-06-01'::timestamp, '2019-06-30'::timestamp, '1 day'::interval) as dd -- Generates all dates in June
+	)

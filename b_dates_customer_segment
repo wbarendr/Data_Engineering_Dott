@@ -1,0 +1,21 @@
+CREATE TABLE b_dates_customer_segment 
+	AS(
+		
+SELECT 		
+	j.day
+	, b.customer_segment
+	FROM b_total_rides_info b
+		CROSS JOIN a_dates_in_june j -- Getting all date and Customer Segment combinations to later put zeros where necessary
+	GROUP BY 
+		j.day
+		, b.customer_segment
+	ORDER BY
+		j.day
+		, CASE customer_segment  -- Ordering the Customer Segment in same order as the assesment
+			WHEN 'New Rider' THEN 1
+			WHEN 'Active' THEN 2
+			WHEN 'Retainable' THEN 3
+			WHEN 'Returned' THEN 4
+			WHEN 'Inactive' THEN 5
+		END
+)

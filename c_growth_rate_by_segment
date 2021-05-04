@@ -1,0 +1,59 @@
+CREATE TABLE c_growth_rate_by_segment 
+	AS (
+SELECT 
+	day
+	, customer_segment
+	, day_total_week_before
+	, day_total
+	, CASE
+		WHEN day_total = 0 AND day_total_week_before = 0 THEN '0.00%'
+		WHEN day_total = 0 AND day_total_week_before != 0 THEN '-100.00%'
+		WHEN day_total != 0 AND day_total_week_before = 0 THEN 'Infinity'
+		ELSE 
+			CASE 
+			WHEN ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) > 100
+				THEN CONCAT(ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) - 100, '%')
+			ELSE CONCAT('-', 100 - ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2), '%')
+			END
+	END as growth_rate
+	FROM (
+
+	SELECT 
+		day
+		, customer_segment
+		, day_total
+		, CASE 
+			WHEN customer_segment = LAG(customer_segment, 7) OVER (ORDER BY customer_segment, day)
+			THEN COALESCE(LAG(day_total, 7) OVER (ORDER BY customer_segment, day), 0)
+			ELSE 0
+		END AS day_total_week_before
+		FROM (
+		SELECT 
+			d.day
+			, d.customer_segment
+			, COALESCE(c.total_day, 0) as day_total
+			FROM b_dates_customer_segment d
+			LEFT JOIN (
+		SELECT 
+			day
+			, customer_segment
+			, COUNT(*) as total_day
+		FROM b_total_rides_info c
+			GROUP BY 
+				day
+				, customer_segment
+		) AS c
+				ON c.day = d.day
+				AND c.customer_segment = d.customer_segment
+	) d
+) w
+	ORDER BY 
+		CASE customer_segment
+			WHEN 'New Rider' THEN 1
+			WHEN 'Active' THEN 2
+			WHEN 'Retainable' THEN 3
+			WHEN 'Returned' THEN 4
+			WHEN 'Inactive' THEN 5
+		END
+		, day
+)

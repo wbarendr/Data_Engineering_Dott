@@ -1,0 +1,142 @@
+CREATE EXTENSION IF NOT EXISTS cube;
+CREATE EXTENSION IF NOT EXISTS earthdistance;
+
+
+CREATE TABLE b_total_rides_info
+  AS(
+WITH 
+
+rides AS (
+	SELECT 
+		user_id 
+	 	, DATE(time_ride_start) as day_start
+		, COUNT(*) as day_total
+		, SUM(EARTH_DISTANCE(
+			LL_TO_EARTH(lat_start, lng_start),
+			ll_to_earth(lat_end, lng_end))) AS Total_distance -- this function added about 5 seconds
+		, MIN(EARTH_DISTANCE(
+			LL_TO_EARTH(lat_start, lng_start),
+			ll_to_earth(lat_end, lng_end))) AS Minimum_distance -- this function added about 2 seconds
+		, MAX(EARTH_DISTANCE(
+			LL_TO_EARTH(lat_start, lng_start),
+			ll_to_earth(lat_end, lng_end))) AS Maximum_distance -- this function added about 2 seconds Should definitely not be necessary to run this function 3 times
+	FROM a_dott_rides
+	GROUP BY 
+		DATE(time_ride_start),
+		user_id
+),
+	  
+users AS (
+	SELECT 
+		user_id
+		, createdAt 
+	FROM a_dott_users
+	GROUP BY 
+		user_id
+		, createdAt
+),
+
+all_dates_user AS (
+	SELECT
+		day
+		, user_id
+		, createdAt 
+	FROM a_dates_in_june d
+	CROSS JOIN users u 
+),
+
+rides_agg AS (
+	SELECT  
+		u.user_id
+		, u.day AS day_start
+		, COALESCE(r.day_total,0) AS day_total  -- make 0 if NULL
+		, SUM(COALESCE(r.day_total, 0)) OVER (PARTITION BY u.user_id ORDER BY u.day ASC) AS cum_day_total  -- calculate cumulative total of rides per user
+		, COALESCE(r.total_distance, 0) AS total_distance
+		, r.minimum_distance
+		, r.maximum_distance
+	FROM all_dates_user u
+		LEFT JOIN rides r
+			ON r.user_id = u.user_id
+			AND u.day = r.day_start
+)
+SELECT 
+	user_id
+	, created_at
+	, day_start AS day
+	, days_active_proxy
+	, day_total
+	, cum_day_total
+	, avg_rides
+	, rider_frequency
+	, rides_in_t
+	, rides_in_t_1
+	, CASE 
+		WHEN day_start - created_at < 7 THEN  'New Rider'
+		WHEN rides_in_t_1 >= 1 AND rides_in_t >= 1 THEN 'Active'
+		WHEN rides_in_t_1 >= 1 AND rides_in_t = 0 THEN 'Retainable'
+		WHEN rides_in_t_1 = 0 AND rides_in_t >= 1 THEN 'Returned'
+		WHEN rides_in_t_1 = 0 AND rides_in_t = 0 THEN 'Inactive'
+		ELSE 'Error'
+		END AS Customer_Segment
+	, total_distance
+	, minimum_distance
+	, maximum_distance
+	FROM (
+	SELECT
+		user_id
+		, created_at
+		, day_start
+		, days_active_proxy
+		, day_total
+		, cum_day_total
+		, total_distance
+		, minimum_distance
+		, maximum_distance
+		, ROUND(cum_day_total / days_active_proxy, 2) AS avg_rides
+		, CASE 
+			WHEN user_id = LAG(user_id, 7) OVER(ORDER BY user_id, day_start) 
+				THEN cum_day_total - LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start)
+			ELSE cum_day_total
+			END AS rides_in_T -- calculates all rides a user had in the last 7 days (T)
+		, CASE 
+			WHEN user_id = LAG(user_id, 7) OVER(ORDER BY user_id, day_start)
+			THEN
+				CASE
+					WHEN LAG(user_id, 7) OVER(ORDER BY user_id, day_start) = LAG(user_id, 14) OVER(ORDER BY user_id, day_start) 
+					THEN LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start) - LAG(cum_day_total, 14) OVER(ORDER BY user_id, day_start)
+					ELSE LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start)
+				END
+			ELSE 0
+			END AS rides_in_T_1 -- calculates all rides a user had between 8 and 14 days ago (T - 1) 
+			-- This is a large calculation for a value which can be found in the table 7 days prior at rides_in_t 
+			-- only when doing this, nesting select seems necessary and the RUN-time was 1.2 seconds longer
+			-- There must be a better way to do this!
+		, CASE 
+			WHEN cum_day_total / days_active_proxy >= 3.0 THEN 'High-frequent-rider'
+			WHEN cum_day_total / days_active_proxy >= 1.0  THEN 'Frequent-rider'
+			WHEN cum_day_total / days_active_proxy < 1.0 THEN 'Low-frequent-rider'
+			ELSE 'error'
+		  END AS rider_frequency
+	FROM (
+		SELECT 
+			DATE(u.createdAt) as created_at
+			, u.user_id
+			, r.day_start
+			, r.day_total
+			, r.cum_day_total			
+			, r.total_distance
+			, r.minimum_distance
+			, r.maximum_distance
+			, r.day_start - 
+				CASE 
+					WHEN DATE(u.createdAt) < DATE('2019-06-01') THEN DATE('2019-06-01')
+					ELSE DATE(u.createdAt)
+				END + 1
+			as days_active_proxy
+		FROM users u
+		LEFT JOIN rides_agg r
+			ON u.user_id = r.user_id
+	) as t
+	WHERE days_active_proxy >= 1
+) as t1
+)

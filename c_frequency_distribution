@@ -1,0 +1,29 @@
+CREATE TABLE c_frequency_distribution
+	AS 
+(
+SELECT 
+	day
+	, rider_frequency
+	, total_frequency
+	, total_day
+	, CONCAT(ROUND(total_frequency / total_day * 100, 2)::VARCHAR, '%') as Distribution
+	FROM 
+	(
+		SELECT
+			f.day as day
+			, f.rider_frequency
+			, COUNT(*) as total_frequency
+			, SUM(COUNT(*)) OVER (partition by f.day) as total_day
+		FROM b_total_rides_info f
+			GROUP BY 
+				f.day
+				, f.rider_frequency
+			ORDER BY 
+				f.day,
+				CASE f.rider_frequency
+					WHEN 'High-frequent-rider' THEN 1
+					WHEN 'Frequent-rider' THEN 2
+					WHEN 'Low-frequent-rider' THEN 3
+				END
+	) AS freq
+)

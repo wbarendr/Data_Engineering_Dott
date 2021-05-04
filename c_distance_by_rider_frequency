@@ -1,0 +1,18 @@
+CREATE TABLE c_distance_by_rider_frequency
+	AS(
+SELECT 
+	rider_frequency
+	, ROUND(SUM(total_distance::numeric), 2) AS total_distance
+	, ROUND(MAX(maximum_distance::numeric), 2) AS maximum_distance
+	, ROUND(SUM(total_distance)::numeric / SUM(day_total)::numeric, 2) AS average_distance
+	, ROUND(MIN(minimum_distance)::numeric, 2) AS minimum_distance
+FROM b_total_rides_info
+	WHERE minimum_distance IS NOT NULL
+	GROUP BY rider_frequency
+	ORDER BY 
+		CASE rider_frequency
+			WHEN 'High-frequent-rider' THEN 1
+			WHEN 'Frequent-rider' THEN 2
+			WHEN 'Low-frequent-rider' THEN 3
+		END
+)	
