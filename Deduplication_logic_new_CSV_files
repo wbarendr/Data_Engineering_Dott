@@ -1,0 +1,112 @@
+CREATE TABLE temp_table_rides(
+	 ride_id CHAR(45)
+	 , user_id CHAR(45)
+	 , time_ride_start TIMESTAMP
+	 , time_ride_end TIMESTAMP
+	 , lng_start FLOAT
+	 , lat_start FLOAT      
+	 , lng_end FLOAT
+	 , lat_end FLOAT   
+	 , booking_amount FLOAT
+	 , UNIQUE(ride_id) 
+);
+
+COPY temp_table_rides(
+	ride_id
+	, user_id
+	, time_ride_start
+	, time_ride_end
+	, lng_start
+	, lat_start
+	, lng_end
+	, lat_end
+	, booking_amount
+) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-rides'
+	DELIMITER ','
+	CSV HEADER;
+
+INSERT INTO a_dott_rides(
+	ride_id
+	, user_id
+	, time_ride_start
+	, time_ride_end
+	, lng_start
+	, lat_start
+	, lng_end
+	, lat_end
+	, booking_amount
+) 
+SELECT *
+	FROM temp_table_rides
+	ON CONFLICT (ride_id)
+		DO NOTHING;
+		
+DROP TABLE temp_table_rides;
+
+CREATE TABLE temp_table_users(
+	 user_id CHAR(45)
+	, updatedAt TIMESTAMP
+	, createdAt TIMESTAMP
+	, has_email BOOL
+	, has_firstName BOOL
+	, has_lastName BOOL
+	, has_phoneNumber BOOL
+	, has_verifiedEmail BOOL
+	, phoneNumberCountryCode CHAR(3)
+	, gender CHAR(6)
+	, mobilePlatform CHAR(7)
+);
+
+COPY temp_table_users(
+	user_id
+	, updatedAt
+	, createdAt
+	, has_email
+	, has_firstName
+	, has_lastName
+	, has_phoneNumber
+	, has_verifiedEmail
+	, phoneNumberCountryCode
+	, gender
+	, mobilePlatform
+) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-users'
+	DELIMITER ','
+	CSV HEADER;
+
+ALTER TABLE temp_table_users
+DROP COLUMN updatedAt,
+DROP COLUMN has_email,
+DROP COLUMN has_firstName,
+DROP COLUMN has_lastName,
+DROP COLUMN has_phoneNumber,
+DROP COLUMN has_verifiedEmail,
+DROP COLUMN phoneNumberCountryCode,
+DROP COLUMN gender,
+DROP COLUMN mobilePlatform;
+
+CREATE TABLE temp2_table_users
+	AS (
+SELECT 
+	*
+FROM a_dott_users
+	GROUP BY 
+		user_id
+		, createdAT
+);
+
+DROP TABLE temp_table_users;
+
+-- ALTER TABLE temp2_table_users
+-- ADD CONSTRAINT unique_equip
+-- UNIQUE (user_id);
+
+INSERT INTO a_dott_users(
+	user_id
+	, createdAt
+) 
+SELECT *
+	FROM temp2_table_users
+	ON CONFLICT (user_id)
+		DO NOTHING;
+		
+DROP TABLE temp2_table_users
