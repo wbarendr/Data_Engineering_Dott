@@ -12,7 +12,7 @@ SELECT
 		ELSE 
 			CASE 
 			WHEN ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) > 100
-				THEN CONCAT(ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) - 100, '%')
+				THEN CONCAT('+', ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2) - 100, '%')
 			ELSE CONCAT('-', 100 - ROUND(day_total::numeric / day_total_week_before::numeric * 100, 2), '%')
 			END
 	END as growth_rate
