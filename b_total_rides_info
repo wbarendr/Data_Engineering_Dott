@@ -1,6 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS cube;
 CREATE EXTENSION IF NOT EXISTS earthdistance;
 
+DROP TABLE b_total_rides_info;
 CREATE TABLE b_total_rides_info
   AS(
 WITH 

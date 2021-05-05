@@ -21,7 +21,7 @@ COPY temp_table_rides(
 	, lng_end
 	, lat_end
 	, booking_amount
-) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-rides'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/FILES_DAILY_UPDATED/data-engineer-test-rides'
 	DELIMITER ','
 	CSV HEADER;
 
@@ -69,7 +69,7 @@ COPY temp_table_users(
 	, phoneNumberCountryCode
 	, gender
 	, mobilePlatform
-) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-users'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/FILES_DAILY_UPDATED/data-engineer-test-users'
 	DELIMITER ','
 	CSV HEADER;
 

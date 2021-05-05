@@ -21,7 +21,7 @@ COPY a_dott_rides(
 	, lng_end
 	, lat_end
 	, booking_amount
-) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-rides'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/LOG_FILES/data-engineer-test-rides'
 	DELIMITER ','
 	CSV HEADER;
 	
@@ -51,7 +51,7 @@ COPY a_dott_users(
 	, phoneNumberCountryCode
 	, gender
 	, mobilePlatform
-) FROM '/Users/wester/Documents/data-engineer-test-5-/data-engineer-test-users'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/LOG_FILES/data-engineer-test-users'
 	DELIMITER ','
 	CSV HEADER;
 
