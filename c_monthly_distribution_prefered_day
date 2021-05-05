@@ -1,0 +1,43 @@
+-- CREATE TABLE c_monthly_distribution_prefered_day 
+-- 	AS (
+SELECT 
+	*
+	, CONCAT(ROUND(monthly_weekday_total / SUM(monthly_weekday_total) OVER (Partition by year, month) * 100, 2), '%') AS Distribution
+	-- Taking all rides per within prefered day and dividing it by total rides in month to get the percentage
+	-- Rounding to get a precision of 2 and making into text for display with %
+	FROM (
+SELECT 
+	year
+	, CASE
+		WHEN month = 1 THEN 'Januari'
+		WHEN month = 2 THEN 'Februari'
+		WHEN month = 3 THEN 'March'
+		WHEN month = 4 THEN 'April'
+		WHEN month = 5 THEN 'May'
+		WHEN month = 6 THEN 'June'
+		WHEN month = 7 THEN 'July'
+		WHEN month = 8 THEN 'August'
+		WHEN month = 9 THEN 'September'
+		WHEN month = 10 THEN 'October'
+		WHEN month = 11 THEN 'November'
+		WHEN month = 12 THEN 'December'
+	  END as month  -- Taking all months and years into account for extensible query
+	, day_of_the_week
+	,SUM(day_total) AS monthly_weekday_total
+	FROM (
+	SELECT 
+		EXTRACT(year FROM day)::int as year --extracting year and month from date to make further calculations easier and more readable
+		, EXTRACT(month  FROM day) as month
+		, day_of_the_week
+		, SUM(day_total) as day_total
+	FROM b_total_rides_info
+		GROUP BY
+			day
+			, day_of_the_week
+	) a
+	GROUP BY 
+	year
+	, month
+	, day_of_the_week
+) b
+-- )

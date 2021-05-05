@@ -1,7 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS cube;
 CREATE EXTENSION IF NOT EXISTS earthdistance;
 
-
 CREATE TABLE b_total_rides_info
   AS(
 WITH 
@@ -41,6 +40,7 @@ all_dates_user AS (
 		day
 		, user_id
 		, createdAt 
+		, day_of_the_week
 	FROM a_dates_in_june d
 	CROSS JOIN users u 
 ),
@@ -49,6 +49,7 @@ rides_agg AS (
 	SELECT  
 		u.user_id
 		, u.day AS day_start
+		, u.day_of_the_week 
 		, COALESCE(r.day_total,0) AS day_total  -- make 0 if NULL
 		, SUM(COALESCE(r.day_total, 0)) OVER (PARTITION BY u.user_id ORDER BY u.day ASC) AS cum_day_total  -- calculate cumulative total of rides per user
 		, COALESCE(r.total_distance, 0) AS total_distance
@@ -63,7 +64,8 @@ SELECT
 	user_id
 	, created_at
 	, day_start AS day
-	, days_active_proxy
+	, day_of_the_week		
+	, days_active
 	, day_total
 	, cum_day_total
 	, avg_rides
@@ -88,13 +90,14 @@ SELECT
 		user_id
 		, created_at
 		, day_start
-		, days_active_proxy
+		, day_of_the_week
+		, days_active
 		, day_total
 		, cum_day_total
 		, total_distance
 		, minimum_distance
 		, maximum_distance
-		, ROUND(cum_day_total / days_active_proxy, 2) AS avg_rides
+		, ROUND(cum_day_total / days_active, 2) AS avg_rides
 		, CASE 
 			WHEN user_id = LAG(user_id, 7) OVER(ORDER BY user_id, day_start) 
 				THEN cum_day_total - LAG(cum_day_total, 7) OVER(ORDER BY user_id, day_start)
@@ -114,9 +117,9 @@ SELECT
 			-- only when doing this, nesting select seems necessary and the RUN-time was 1.2 seconds longer
 			-- There must be a better way to do this!
 		, CASE 
-			WHEN cum_day_total / days_active_proxy >= 3.0 THEN 'High-frequent-rider'
-			WHEN cum_day_total / days_active_proxy >= 1.0  THEN 'Frequent-rider'
-			WHEN cum_day_total / days_active_proxy < 1.0 THEN 'Low-frequent-rider'
+			WHEN cum_day_total / days_active >= 3.0 THEN 'High-frequent-rider'
+			WHEN cum_day_total / days_active >= 1.0  THEN 'Frequent-rider'
+			WHEN cum_day_total / days_active < 1.0 THEN 'Low-frequent-rider'
 			ELSE 'error'
 		  END AS rider_frequency
 	FROM (
@@ -125,6 +128,7 @@ SELECT
 			, u.user_id
 			, r.day_start
 			, r.day_total
+			, r.day_of_the_week
 			, r.cum_day_total			
 			, r.total_distance
 			, r.minimum_distance
@@ -134,11 +138,11 @@ SELECT
 					WHEN DATE(u.createdAt) < DATE('2019-06-01') THEN DATE('2019-06-01')
 					ELSE DATE(u.createdAt)
 				END + 1
-			as days_active_proxy
+			as days_active
 		FROM users u
 		LEFT JOIN rides_agg r
 			ON u.user_id = r.user_id
 	) as t
-	WHERE days_active_proxy >= 1
+	WHERE days_active >= 1
 ) as t1
 )
