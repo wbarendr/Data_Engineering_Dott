@@ -1,4 +1,4 @@
--- CREATE TABLE c_monthly_distribution_prefered_day 
+-- CREATE TABLE c_monthly_distribution_preferred_day 
 -- 	AS (
 SELECT 
 	*
