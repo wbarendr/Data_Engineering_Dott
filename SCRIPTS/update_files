@@ -1,13 +1,14 @@
 #!/bin/bash
 
-B1=`cat b_total_rides_info`
+B1=`cat ../QUERIES/b_total_rides_info`
 echo "Updating raw data files..."
 # pwd | tr -d '\n'> tmp
-NEW_FILES=`cat Deduplication_logic_new_CSV_files`
+NEW_FILES=`cat ../QUERIES/Deduplication_logic_new_CSV_files`
 # echo "$NEW_FILES"
 psql -U wester -d postgres -c "$NEW_FILES"
 
 echo "CREATING MAIN TABLE..."
-# psql -U wester -d postgres -c "$B1"
+psql -U wester -d postgres -c "$B1"
 
-# echo "Background workers done with task"
+echo "Main table ready"
+echo "run executable could be used for data analysing"

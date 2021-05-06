@@ -4,11 +4,11 @@ CREATE TABLE temp_table_rides(
 	 , time_ride_start TIMESTAMP
 	 , time_ride_end TIMESTAMP
 	 , lng_start FLOAT
-	 , lat_start FLOAT      
+	 , lat_start FLOAT
 	 , lng_end FLOAT
-	 , lat_end FLOAT   
+	 , lat_end FLOAT
 	 , booking_amount FLOAT
-	 , UNIQUE(ride_id) 
+	 , UNIQUE(ride_id)
 );
 
 COPY temp_table_rides(
@@ -21,7 +21,7 @@ COPY temp_table_rides(
 	, lng_end
 	, lat_end
 	, booking_amount
-) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/FILES_DAILY_UPDATED/data-engineer-test-rides'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-rides'
 	DELIMITER ','
 	CSV HEADER;
 
@@ -35,12 +35,12 @@ INSERT INTO a_dott_rides(
 	, lng_end
 	, lat_end
 	, booking_amount
-) 
+)
 SELECT *
 	FROM temp_table_rides
 	ON CONFLICT (ride_id)
 		DO NOTHING;
-		
+
 DROP TABLE temp_table_rides;
 
 CREATE TABLE temp_table_users(
@@ -69,7 +69,7 @@ COPY temp_table_users(
 	, phoneNumberCountryCode
 	, gender
 	, mobilePlatform
-) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/FILES_DAILY_UPDATED/data-engineer-test-users'
+) FROM '/Users/wester/Documents/data-engineer-test-5-/REPO/CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-users'
 	DELIMITER ','
 	CSV HEADER;
 
@@ -86,10 +86,10 @@ DROP COLUMN mobilePlatform;
 
 CREATE TABLE temp2_table_users
 	AS (
-SELECT 
+SELECT
 	*
-FROM a_dott_users
-	GROUP BY 
+FROM temp_table_users
+	GROUP BY
 		user_id
 		, createdAT
 );
@@ -97,16 +97,16 @@ FROM a_dott_users
 DROP TABLE temp_table_users;
 
 -- ALTER TABLE temp2_table_users
--- ADD CONSTRAINT unique_equip
+-- ADD CONSTRAINT unique_equip_users
 -- UNIQUE (user_id);
 
 INSERT INTO a_dott_users(
 	user_id
 	, createdAt
-) 
+)
 SELECT *
 	FROM temp2_table_users
 	ON CONFLICT (user_id)
 		DO NOTHING;
-		
+
 DROP TABLE temp2_table_users

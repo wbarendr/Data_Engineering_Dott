@@ -20,23 +20,23 @@ int main(int argc, char **argv)
         return print_strings();
     if (argv[1][0] == '1'){
         std::cout << std::endl << "   Daily rider frequency distribution" << std::endl << std::endl;
-        system("psql -U wester -d postgres -c \"`cat c_frequency_distribution`\"");
+        system("psql -U wester -d postgres -c \"`cat ../QUERIES/c_frequency_distribution`\"");
     }
     else if (argv[1][0] == '2'){
         std::cout << std::endl << "   Monthly frequency distribution for preferred day" << std::endl << std::endl;
-        system("psql -U wester -d postgres -c \"`cat c_monthly_distribution_preferred_day`\"");
+        system("psql -U wester -d postgres -c \"`cat ../QUERIES/c_monthly_distribution_preferred_day`\"");
     }
     else if (argv[1][0] == '3'){
         std::cout << std::endl << "   Growth rate by segment week-to-week" << std::endl << std::endl;
-        system("psql -U wester -d postgres -c \"`cat c_growth_rate_by_segment`\"");
+        system("psql -U wester -d postgres -c \"`cat ../QUERIES/c_growth_rate_by_segment`\"");
     }
     else if (argv[1][0] == '4'){
         std::cout << std::endl << "   Total, maximum, average and minimum ride distance by rider frequency" << std::endl << std::endl;
-        system("psql -U wester -d postgres -c \"`cat c_distance_by_rider_frequency`\"");
+        system("psql -U wester -d postgres -c \"`cat ../QUERIES/c_distance_by_rider_frequency`\"");
     }
     else if (argv[1][0] == '5'){
         std::cout << std::endl << "   How many days, on average, do our customers stay in the ‘Active’ segment" << std::endl << std::endl;
-        system("psql -U wester -d postgres -c \"`cat c_consecutive_days_active_average`\"");
+        system("psql -U wester -d postgres -c \"`cat ../QUERIES/c_consecutive_days_active_average`\"");
     }
     else 
         return print_strings();

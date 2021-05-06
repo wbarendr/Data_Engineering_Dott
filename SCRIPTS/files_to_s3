@@ -2,18 +2,18 @@
 
 
 #[--------------------------------]
-cp FILES_DAILY_UPDATED/* LOG_FILES
+cp ../CSV_FILES/FILES_DAILY_UPDATED/* ../CSV_FILES/LOG_FILES
 
-echo -n "LOG_FILES/data-engineer-test-rides" > rides.txt
+echo -n "../CSV_FILES/LOG_FILES/data-engineer-test-rides" > rides.txt
 date '+_%B_%d_%Y' >> rides.txt
 R1=`cat rides.txt`
 
-echo -n "LOG_FILES/data-engineer-test-users" > users.txt
+echo -n "../CSV_FILES/LOG_FILES/data-engineer-test-users" > users.txt
 date '+_%B_%d_%Y' >> users.txt
 U1=`cat users.txt`
 
-mv LOG_FILES/data-engineer-test-rides "$R1"
-mv LOG_FILES/data-engineer-test-users "$U1"
+mv ../CSV_FILES/LOG_FILES/data-engineer-test-rides "$R1"
+mv ../CSV_FILES/LOG_FILES/data-engineer-test-users "$U1"
 
 rm users.txt
 rm rides.txt
@@ -21,9 +21,8 @@ rm rides.txt
 # section puts date on file names before moving to external cloud
 
 echo "Logging data-engineer-test-rides with date to s3 cloud"
-# aws s3 mv "$R1" s3://dott-assignment-data-engineer
+aws s3 mv "$R1" s3://dott-assignment-data-engineer
 echo "Logging data-engineer-test-users with date to s3 cloud"
-# aws s3 mv "$U1" s3://dott-assignment-data-engineer
+aws s3 mv "$U1" s3://dott-assignment-data-engineer
 
 
-# Don't forget to extend the june table beyond june 2019

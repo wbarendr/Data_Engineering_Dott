@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm nohup.out
+rm -f nohup.out
 
 #[--------------------------------]
 nohup ./files_to_s3 & jobs 
