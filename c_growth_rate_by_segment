@@ -1,5 +1,5 @@
-CREATE TABLE c_growth_rate_by_segment 
-	AS (
+-- CREATE TABLE c_growth_rate_by_segment 
+-- 	AS (
 		-- this table only shows relevant data starting at the 2019-06-15. 
 		--Except for the segment 'New Rider' There the relevant data starts at 2019-06-08 
 SELECT 
@@ -60,4 +60,4 @@ SELECT
 			WHEN 'Inactive' THEN 5
 		END
 		, day
-)
+-- )

@@ -1,6 +1,6 @@
-CREATE TABLE c_frequency_distribution
-	AS 
-(
+-- CREATE TABLE c_frequency_distribution
+-- 	AS 
+-- (
 SELECT 
 	day
 	, rider_frequency
@@ -26,4 +26,4 @@ SELECT
 					WHEN 'Low-frequent-rider' THEN 3
 				END
 	) AS freq
-)
+-- )

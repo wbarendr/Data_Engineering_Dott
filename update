@@ -1,0 +1,14 @@
+#!/bin/bash
+
+rm nohup.out
+
+#[--------------------------------]
+nohup ./files_to_s3 & jobs 
+#[--------------------------------]
+# Runs files Logging in the background Output to nohup.out
+
+#[--------------------------------]
+./update_files
+#[--------------------------------]
+# Rather have the updating of database and creation of tables running in the foreground, so they won't be accesed before completion 
+

@@ -1,5 +1,5 @@
-CREATE TABLE c_distance_by_rider_frequency
-	AS(
+-- CREATE TABLE c_distance_by_rider_frequency
+-- 	AS(
 SELECT 
 	rider_frequency
 	, ROUND(SUM(total_distance::numeric), 2) AS total_distance
@@ -18,5 +18,5 @@ FROM b_total_rides_info
 			WHEN 'Frequent-rider' THEN 2
 			WHEN 'Low-frequent-rider' THEN 3
 		END
-)
+-- )
 		
