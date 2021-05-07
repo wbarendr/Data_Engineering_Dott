@@ -28,7 +28,7 @@ Questions 1. What is the daily rider frequency distribution?
 Most of the High-frequent riders only fall in this frequency in their first day.
 This is because the calculation uses the users day of creation as the start date to calculate the average. 
 The numbers are also skewed in the different direction because the data doesn’t have a “deletedAt” column. Because this is missing, riders will fall under the Low-frequent-rider into eternity when have only used Dott services perhaps once. 
-To look for a better distribution of rider frequency one could not take the users which fall under “New Riders” and “Inactive” of the Customer Segment into account to find a more sustainable distribution. 
+To look for a more sensible distribution of rider frequency one could not take the users which fall under “New Riders” and “Inactive” of the Customer Segment into account. 
 
 Questions 2. What is the monthly frequency for preferred week days? 
 c_monthly_distribution_preferred_day
@@ -61,3 +61,5 @@ Doing this assignment shed some light on the fast amount of data tooling there i
 If time would not be of essence I would love to dive into these systems, see how they work and learn why or why not to implement them for certain tasks. 
 
 I would also love to implement a data visualizer, although this might be more the job for the analyser. They could be used to easily find mistakes in the query logic, plus graphs are awesome. 
+
+Thank you for reading my assignment and I'm looking forward to hearing from you soon.
