@@ -54,3 +54,10 @@ Questions 5. How many days, on average, do our customers stay in the â€˜Activeâ€
 c_consecutive_days_active_average
 
   Here the average should be slightly higher since the active segment starts at 2019-06-08 and there could have been consecutive Active users before this date. 
+
+
+General improvements of my work: 
+Doing this assignment shed some light on the fast amount of data tooling there is out there. Especially interesting tools like Hadoop, Airflow, Kafka or PgTap.
+If time would not be of essence I would love to dive into these systems, see how they work and learn why or why not to implement them for certain tasks. 
+
+I would also love to implement a data visualizer, although this might be more the job for the analyser. They could be used to easily find mistakes in the query logic, plus graphs are awesome. 
