@@ -3,6 +3,14 @@
 rm -f nohup.out
 
 #[--------------------------------]
+cd ../CSV_FILES/FILES_DAILY_UPDATED
+unzip data-engineer-test-rides.zip
+unzip data-engineer-test-users.zip
+cd -
+#[--------------------------------]
+# Unzipping the CSV FILES
+
+#[--------------------------------]
 nohup ./files_to_s3 & jobs 
 #[--------------------------------]
 # Runs files Logging in the background Output to nohup.out

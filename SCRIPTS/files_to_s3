@@ -2,7 +2,8 @@
 
 
 #[--------------------------------]
-cp ../CSV_FILES/FILES_DAILY_UPDATED/* ../CSV_FILES/LOG_FILES
+cp ../CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-rides ../CSV_FILES/LOG_FILES
+cp ../CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-users ../CSV_FILES/LOG_FILES
 
 echo -n "../CSV_FILES/LOG_FILES/data-engineer-test-rides" > rides.txt
 date '+_%B_%d_%Y' >> rides.txt
