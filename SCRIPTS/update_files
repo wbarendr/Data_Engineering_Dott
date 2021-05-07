@@ -12,5 +12,7 @@ psql -U wester -d postgres -c "$B1"
 #[--------------------------------]
 # section sends queries to postgres database to update the main table
 
+rm ../CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-rides
+rm ../CSV_FILES/FILES_DAILY_UPDATED/data-engineer-test-users
 echo "Main table ready"
 echo "run executable could be used for data analysing"

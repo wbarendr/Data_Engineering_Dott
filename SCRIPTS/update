@@ -6,6 +6,7 @@ rm -f nohup.out
 cd ../CSV_FILES/FILES_DAILY_UPDATED
 unzip data-engineer-test-rides.zip
 unzip data-engineer-test-users.zip
+rm -rf __MACOSX
 cd -
 #[--------------------------------]
 # Unzipping the CSV FILES
